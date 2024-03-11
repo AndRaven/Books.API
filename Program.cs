@@ -1,20 +1,20 @@
-using Serilog;
-using Serilog.Events;
+// using Serilog;
+// using Serilog.Events;
 
 var builder = WebApplication.CreateBuilder(args);
 
 //add Serilog
 
-var logger = new LoggerConfiguration()
-             .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-             .Enrich.FromLogContext()
-             .Enrich.WithProperty("ApplicationName", "Books.API")
-             .Enrich.WithProperty("MachineName", Environment.MachineName)
-             .WriteTo.Console()
-             .CreateLogger();
+// var logger = new LoggerConfiguration()
+//              .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+//              .Enrich.FromLogContext()
+//              .Enrich.WithProperty("ApplicationName", "Books.API")
+//              .Enrich.WithProperty("MachineName", Environment.MachineName)
+//              .WriteTo.Console()
+//              .CreateLogger();
 
-builder.Logging.ClearProviders();
-builder.Logging.AddSerilog(logger);
+// builder.Logging.ClearProviders();
+// builder.Logging.AddSerilog(logger);
 
 // Add services to the container.
 
