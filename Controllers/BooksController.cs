@@ -1,6 +1,7 @@
 
 using Books.API.Models;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 // using Serilog;
 
 
@@ -19,7 +20,7 @@ public class BookController : ControllerBase
     public ActionResult<IEnumerable<BookDto>> GetBooks()
     {
 
-        //Log.Information("Getting all books");
+        Log.Information("Getting all books");
         var booksFromStore = _bookService.GetBooks();
 
         var bookDtos = new List<BookDto>();

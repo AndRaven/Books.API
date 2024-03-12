@@ -1,20 +1,32 @@
 // using Serilog;
 // using Serilog.Events;
 
+using Serilog;
+using Serilog.Events;
+
 var builder = WebApplication.CreateBuilder(args);
 
 //add Serilog
 
-// var logger = new LoggerConfiguration()
-//              .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-//              .Enrich.FromLogContext()
-//              .Enrich.WithProperty("ApplicationName", "Books.API")
-//              .Enrich.WithProperty("MachineName", Environment.MachineName)
-//              .WriteTo.Console()
-//              .CreateLogger();
+var logger = new LoggerConfiguration()
+             .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+             .Enrich.FromLogContext()
+             .Enrich.WithProperty("ApplicationName", "Books.API")
+             .Enrich.WithProperty("MachineName", Environment.MachineName)
+             .WriteTo.Console()
+             .CreateLogger();
 
-// builder.Logging.ClearProviders();
-// builder.Logging.AddSerilog(logger);
+ //log to console only in Development environment
+ var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+if (env == Environments.Development)
+{
+     builder.Host.UseSerilog(
+        (context, loggerConfiguration) => loggerConfiguration
+            .MinimumLevel.Debug()
+            .WriteTo.Console());
+}
+   
 
 // Add services to the container.
 
