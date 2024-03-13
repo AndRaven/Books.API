@@ -10,5 +10,5 @@ public class BookDto
     public string? Genre { get; set; }
     public int Year { get; set; }
     public string? Language { get; set; }
-    public int? Pages { get; set; }
+    public int Pages { get; set; }
 }
