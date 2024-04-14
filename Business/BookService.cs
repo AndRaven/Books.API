@@ -40,4 +40,34 @@ public class BookService : IBookService
     {
         return _booksDataStore.Books;
     }
+
+    public void UpdateBook(int bookId, Book book)
+    {
+        var bookFound = GetBookById(bookId);
+
+        if (bookFound != null)
+        {
+            bookFound.Title = book.Title;
+            bookFound.Author = book.Author;
+            bookFound.Description = book.Description;
+            bookFound.Genre = book.Genre;
+            bookFound.Year = book.Year;
+            bookFound.Pages = book.Pages;
+        }
+
+
+    }
+
+    public void DeleteBook(int bookId)
+    {
+        var bookFound = GetBookById(bookId);
+
+        if (bookFound != null)
+            _booksDataStore.Books.Remove(bookFound);
+    }
+
+    public int GetMaxId()
+    {
+        return _booksDataStore.Books.Max(b => b.Id);
+    }
 }
