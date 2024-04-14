@@ -1,6 +1,7 @@
 // using Serilog;
 // using Serilog.Events;
 
+using Microsoft.AspNetCore.HttpOverrides;
 using Serilog;
 using Serilog.Events;
 
@@ -16,17 +17,17 @@ var logger = new LoggerConfiguration()
              .WriteTo.Console()
              .CreateLogger();
 
- //log to console only in Development environment
- var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+//log to console only in Development environment
+var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
 if (env == Environments.Development)
 {
-     builder.Host.UseSerilog(
-        (context, loggerConfiguration) => loggerConfiguration
-            .MinimumLevel.Debug()
-            .WriteTo.Console());
+    builder.Host.UseSerilog(
+       (context, loggerConfiguration) => loggerConfiguration
+           .MinimumLevel.Debug()
+           .WriteTo.Console());
 }
-   
+
 
 // Add services to the container.
 
@@ -42,14 +43,25 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddSingleton<BooksDataStore>();
 
+//add forwarded header options - for deployment
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+});
+
 var app = builder.Build();
 
+app.UseForwardedHeaders();
+
+app.UseMiddleware<CustomExceptionHandlingMidleware>();
+
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+//if (app.Environment.IsDevelopment())
+//{
+app.UseSwagger();
+app.UseSwaggerUI();
+//}
 
 app.UseHttpsRedirection();
 

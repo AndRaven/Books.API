@@ -112,6 +112,7 @@ public class BookController : ControllerBase
 
         if (!bookExists)
         {
+            //throw new ApplicationException($"Book with id {id} not found");
             return NotFound();
         }
         
