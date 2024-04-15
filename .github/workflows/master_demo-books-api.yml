@@ -19,7 +19,7 @@ jobs:
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '6.0.x'
+          dotnet-version: "6.0.x"
           include-prerelease: true
 
       - name: Build with dotnet
@@ -38,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     environment:
-      name: 'Production'
+      name: "Production"
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
       id-token: write #This is required for requesting the JWT
@@ -48,19 +48,18 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: .net-app
-      
+
       - name: Login to Azure
         uses: azure/login@v1
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_A6849277FF7242A88C2A1B134096C060 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_1A44DB9CA07E4AB19AE8AE1CA4C0348D }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_29AAD63D1022416E8593E0062020D6F8 }}
+          client-id: ${{ secrets.BOOKS_API_AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.BOOKS_API_AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'demo-books-api'
-          slot-name: 'Production'
+          app-name: "demo-books-api"
+          slot-name: "Production"
           package: .
-          
