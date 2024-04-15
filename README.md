@@ -11,8 +11,6 @@ Enpoints provided are:
 - update existing book: PUT /api/books/{id}
 - delete existing book: DELETE /api/books/{id}
 
-Running locally
+The API can be run on a local machine or in a Docker container.
 
-Running in Docker container
-
-Deployement to AWS
+API deployed to Azure AppService
