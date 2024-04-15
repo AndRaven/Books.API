@@ -52,7 +52,7 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v1
         with:
-          client-id: ${{ secrets.BOOKS_API_AZURE_CLIENT_ID }}
+          client-id: ${{ secrets.AZURE_MANAGE_BOOKS_API_CLIENT_ID }}
           tenant-id: ${{ secrets.BOOKS_API_AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
@@ -60,6 +60,6 @@ jobs:
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
-          app-name: "demo-books-api"
+          app-name: "manage-books-api"
           slot-name: "Production"
           package: .
