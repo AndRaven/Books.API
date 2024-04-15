@@ -1,21 +1,22 @@
 // using Serilog;
 // using Serilog.Events;
 
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.HttpOverrides;
 using Serilog;
 using Serilog.Events;
 
-var builder = WebApplication.CreateBuilder(args);
 
 //add Serilog
-
-var logger = new LoggerConfiguration()
+Log.Logger = new LoggerConfiguration()
              .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
              .Enrich.FromLogContext()
              .Enrich.WithProperty("ApplicationName", "Books.API")
              .Enrich.WithProperty("MachineName", Environment.MachineName)
              .WriteTo.Console()
              .CreateLogger();
+
+var builder = WebApplication.CreateBuilder(args);
 
 //log to console only in Development environment
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
@@ -26,6 +27,19 @@ if (env == Environments.Development)
        (context, loggerConfiguration) => loggerConfiguration
            .MinimumLevel.Debug()
            .WriteTo.Console());
+}
+else
+{
+    builder.Host.UseSerilog(
+   (context, loggerConfiguration) => loggerConfiguration
+       .MinimumLevel.Debug()
+       .WriteTo.Console()
+       .WriteTo.ApplicationInsights(
+        new TelemetryConfiguration
+        {
+            InstrumentationKey = builder.Configuration["ApplicationInsightsInstrumentationKey"]
+        },
+        TelemetryConverter.Traces));
 }
 
 
