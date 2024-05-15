@@ -42,7 +42,7 @@ public class CustomExceptionHandlingMidleware
             return context.Response.WriteAsJsonAsync(new
             {
                 ErrorId = errorId,
-                Message = "Something bad happened in our API."
+                Message = "An error occured while calling the API. Please try again later or contact support and provide the error id."
             });
         }
     }

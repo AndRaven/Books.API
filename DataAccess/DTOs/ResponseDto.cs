@@ -1,10 +1,13 @@
 
 public class ResponseDto
 {
-    public object? Result { get; set; }
+    public object? Data { get; set; }
 
     public bool IsSuccess { get; set; } = true;
 
-    public string Message { get; set; } = string.Empty;
+    public int StatusCode { get; set; } = 200;
+
+    public string Message
+    { get; set; } = string.Empty;
 
 }

@@ -27,48 +27,73 @@ public class BookController : ControllerBase
         var bookDtos = new List<BookDto>();
 
         //convert books to bookDtos
-        foreach(var book in booksFromStore)
+        foreach (var book in booksFromStore)
         {
-           bookDtos.Add( new BookDto 
-           {
-              Id = book.Id,
-              Author = book.Author,
-              Title = book.Title,
-              Description = book.Description,
-              Genre = book.Genre,
-              Year = book.Year,
-              Pages = book.Pages
-           });
+            bookDtos.Add(new BookDto
+            {
+                Id = book.Id,
+                Author = book.Author,
+                Title = book.Title,
+                Description = book.Description,
+                Genre = book.Genre,
+                Year = book.Year,
+                Pages = book.Pages
+            });
         }
 
-        return Ok(bookDtos);
+        var booksResponseDto = new ResponseDto
+        {
+            Data = bookDtos,
+            IsSuccess = true,
+            StatusCode = 200,
+            Message = "Books retrieved successfully"
+        };
+
+        return Ok(booksResponseDto);
 
     }
 
     [HttpGet("{id}", Name = "GetBook")]
     public ActionResult<BookDto> GetBook(int id)
     {
-       Log.Information("Getting book with id {id}", id);
+        Log.Information("Getting book with id {id}", id);
 
-       var bookFromStore = _bookService.GetBookById(id);
+        var bookFromStore = _bookService.GetBookById(id);
 
-       if (bookFromStore == null)
-       {
-           return NotFound();
-       }
-       else
-       {
-           return Ok(new BookDto
-           {
-              Id = bookFromStore.Id, 
-              Author = bookFromStore.Author,
-              Title = bookFromStore.Title,
-              Description = bookFromStore.Description,
-              Genre = bookFromStore.Genre,
-              Year = bookFromStore.Year,
-              Pages = bookFromStore.Pages
-           });
-       }
+        if (bookFromStore == null)
+        {
+            var bookResponseDto = new ResponseDto
+            {
+                Data = null,
+                IsSuccess = false,
+                StatusCode = 404,
+                Message = "Book not found"
+
+            };
+
+            return NotFound(bookResponseDto);
+        }
+        else
+        {
+            var bookResponseDto = new ResponseDto
+            {
+                Data = new BookDto
+                {
+                    Id = bookFromStore.Id,
+                    Author = bookFromStore.Author,
+                    Title = bookFromStore.Title,
+                    Description = bookFromStore.Description,
+                    Genre = bookFromStore.Genre,
+                    Year = bookFromStore.Year,
+                    Pages = bookFromStore.Pages
+                },
+                IsSuccess = true,
+                StatusCode = 200,
+                Message = "Book retrieved successfully"
+            };
+
+            return Ok(bookResponseDto);
+        }
     }
 
     [HttpPost]
@@ -76,11 +101,11 @@ public class BookController : ControllerBase
     {
         Log.Information("Creating book with title {title}", book.Title);
 
-        var bookToAdd = new Book(book.Title, 
-                                book.Author, 
-                                book.Description ?? "description", 
-                                book.Genre ?? "ficbtion", 
-                                book.Year, 
+        var bookToAdd = new Book(book.Title,
+                                book.Author,
+                                book.Description ?? "description",
+                                book.Genre ?? "fiction",
+                                book.Year,
                                 book.Pages);
 
         int maxId = _bookService.GetMaxId();
@@ -88,16 +113,25 @@ public class BookController : ControllerBase
 
         _bookService.AddBook(bookToAdd);
 
-        return CreatedAtRoute("GetBook", new { id = bookToAdd.Id }, new BookDto
+        var responseDto = new ResponseDto
         {
-            Id = bookToAdd.Id,
-            Title = bookToAdd.Title,
-            Author = bookToAdd.Author,
-            Description = bookToAdd.Description,
-            Year = bookToAdd.Year,
-            Pages = bookToAdd.Pages,
-            Genre = bookToAdd.Genre
-        });
+            Data = new BookDto
+            {
+                Id = bookToAdd.Id,
+                Title = bookToAdd.Title,
+                Author = bookToAdd.Author,
+                Description = bookToAdd.Description,
+                Year = bookToAdd.Year,
+                Pages = bookToAdd.Pages,
+                Genre = bookToAdd.Genre
+
+            },
+            IsSuccess = false,
+            StatusCode = 404,
+            Message = "Book not found"
+        };
+
+        return CreatedAtRoute("GetBook", new { id = bookToAdd.Id }, responseDto);
     }
 
     [HttpPut("{id}")]
@@ -115,40 +149,61 @@ public class BookController : ControllerBase
             //throw new ApplicationException($"Book with id {id} not found");
             return NotFound();
         }
-        
+
         var bookToUpdate = new Book(book.Title, book.Author, book.Description, book.Genre, book.Year, book.Pages);
         bookToUpdate.Id = id;
-        
+
         _bookService.UpdateBook(id, bookToUpdate);
 
-        return Ok(new BookDto
+        var bookDto = new BookDto
         {
-              Id = bookToUpdate.Id,
-              Author = book.Author,
-              Title = book.Title,
-              Description = book.Description,
-              Genre = book.Genre,
-              Year = book.Year,
-              Pages = book.Pages
+            Id = bookToUpdate.Id,
+            Author = book.Author,
+            Title = book.Title,
+            Description = book.Description,
+            Genre = book.Genre,
+            Year = book.Year,
+            Pages = book.Pages
 
-        });
+        };
+
+        var responseDto = new ResponseDto
+        {
+            Data = bookDto,
+            IsSuccess = true,
+            StatusCode = 200,
+            Message = "Book updated successfully"
+        };
+
+        return Ok(responseDto);
     }
 
     [HttpDelete("{id}")]
     public ActionResult DeleteBook(int id)
     {
         Log.Information("Deleting book with id {id}", id);
- 
-         //check if book to update exists
+
+        //check if book to update exists
         bool bookExists = _bookService.CheckIfBookExists(id);
 
 
         if (!bookExists)
         {
-            return NotFound();
+
+            var responseDto = new ResponseDto
+            {
+                Data = null,
+                IsSuccess = false,
+                StatusCode = 404,
+                Message = "Book not found"
+            };
+
+
+            return NotFound(responseDto);
         }
 
         _bookService.DeleteBook(id);
+
 
         return NoContent();
 
