@@ -3,6 +3,7 @@
 
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
 
@@ -54,8 +55,17 @@ builder.Services.AddControllers(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<IBookService, BookService>();
-builder.Services.AddSingleton<BooksDataStore>();
+
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+//used for initial development, before using EF core migrations and SQLite, code first approach
+//builder.Services.AddSingleton<BooksDataStore>();
+
+var sqlLiteConnString = builder.Configuration["ConnectionStrings:BooksDBConnectionString"];
+//register the DB context
+builder.Services.AddDbContext<BooksDbContext>(dbContextOptions => dbContextOptions.UseSqlite(sqlLiteConnString));
 
 //add forwarded header options - for deployment
 builder.Services.Configure<ForwardedHeadersOptions>(options =>

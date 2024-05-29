@@ -1,4 +1,5 @@
 
+using AutoMapper;
 using Books.API.DataAccess.Entities;
 using Books.API.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -11,35 +12,27 @@ using Serilog;
 public class BookController : ControllerBase
 {
     private readonly IBookService _bookService;
+    private readonly IMapper _mapper;
 
-    public BookController(IBookService bookService)
+    public BookController(IBookService bookService, IMapper mapper)
     {
-        _bookService = bookService;
+        _bookService = bookService ?? throw new ArgumentNullException(nameof(bookService));
+
+        _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<BookDto>> GetBooks()
+    public async Task<ActionResult<IEnumerable<BookDto>>> GetBooks()
     {
 
         Log.Information("Getting all books");
-        var booksFromStore = _bookService.GetBooks();
 
-        var bookDtos = new List<BookDto>();
+        var booksFromStore = await _bookService.GetBooksAsync();
 
-        //convert books to bookDtos
-        foreach (var book in booksFromStore)
-        {
-            bookDtos.Add(new BookDto
-            {
-                Id = book.Id,
-                Author = book.Author,
-                Title = book.Title,
-                Description = book.Description,
-                Genre = book.Genre,
-                Year = book.Year,
-                Pages = book.Pages
-            });
-        }
+        //use AutoMapper to map between Book Entity and BookDto
+
+        var bookDtos = _mapper.Map<IEnumerable<BookDto>>(booksFromStore);
 
         var booksResponseDto = new ResponseDto
         {
@@ -54,11 +47,11 @@ public class BookController : ControllerBase
     }
 
     [HttpGet("{id}", Name = "GetBook")]
-    public ActionResult<BookDto> GetBook(int id)
+    public async Task<ActionResult<BookDto>> GetBook(int id)
     {
         Log.Information("Getting book with id {id}", id);
 
-        var bookFromStore = _bookService.GetBookById(id);
+        var bookFromStore = await _bookService.GetBookByIdAsync(id);
 
         if (bookFromStore == null)
         {
@@ -77,16 +70,7 @@ public class BookController : ControllerBase
         {
             var bookResponseDto = new ResponseDto
             {
-                Data = new BookDto
-                {
-                    Id = bookFromStore.Id,
-                    Author = bookFromStore.Author,
-                    Title = bookFromStore.Title,
-                    Description = bookFromStore.Description,
-                    Genre = bookFromStore.Genre,
-                    Year = bookFromStore.Year,
-                    Pages = bookFromStore.Pages
-                },
+                Data = _mapper.Map<BookDto>(bookFromStore),
                 IsSuccess = true,
                 StatusCode = 200,
                 Message = "Book retrieved successfully"
@@ -96,95 +80,95 @@ public class BookController : ControllerBase
         }
     }
 
-    [HttpPost]
-    public ActionResult<BookDto> CreateBook(BookForCreationDto book)
-    {
-        Log.Information("Creating book with title {title}", book.Title);
+    // [HttpPost]
+    // public ActionResult<BookDto> CreateBook(BookForCreationDto book)
+    // {
+    //     Log.Information("Creating book with title {title}", book.Title);
 
-        var bookToAdd = new Book(book.Title,
-                                book.Author,
-                                book.Description ?? "description",
-                                book.Genre ?? "fiction",
-                                book.Year,
-                                book.Pages);
+    //     var bookToAdd = new Book(book.Title,
+    //                             book.Author,
+    //                             book.Description ?? "description",
+    //                             book.Genre ?? "fiction",
+    //                             book.Year,
+    //                             book.Pages);
 
-        int maxId = _bookService.GetMaxId();
-        bookToAdd.Id = maxId + 1;
+    //     int maxId = _bookService.GetMaxId();
+    //     bookToAdd.Id = maxId + 1;
 
-        _bookService.AddBook(bookToAdd);
+    //     _bookService.AddBook(bookToAdd);
 
-        var responseDto = new ResponseDto
-        {
-            Data = new BookDto
-            {
-                Id = bookToAdd.Id,
-                Title = bookToAdd.Title,
-                Author = bookToAdd.Author,
-                Description = bookToAdd.Description,
-                Year = bookToAdd.Year,
-                Pages = bookToAdd.Pages,
-                Genre = bookToAdd.Genre
+    //     var responseDto = new ResponseDto
+    //     {
+    //         Data = new BookDto
+    //         {
+    //             Id = bookToAdd.Id,
+    //             Title = bookToAdd.Title,
+    //             Author = bookToAdd.Author,
+    //             Description = bookToAdd.Description,
+    //             Year = bookToAdd.Year,
+    //             Pages = bookToAdd.Pages,
+    //             Genre = bookToAdd.Genre
 
-            },
-            IsSuccess = false,
-            StatusCode = 404,
-            Message = "Book not found"
-        };
+    //         },
+    //         IsSuccess = false,
+    //         StatusCode = 404,
+    //         Message = "Book not found"
+    //     };
 
-        return CreatedAtRoute("GetBook", new { id = bookToAdd.Id }, responseDto);
-    }
+    //     return CreatedAtRoute("GetBook", new { id = bookToAdd.Id }, responseDto);
+    // }
 
-    [HttpPut("{id}")]
-    public ActionResult<BookDto> UpdateBook(int id, BookForUpdateDto book)
-    {
+    // [HttpPut("{id}")]
+    // public ActionResult<BookDto> UpdateBook(int id, BookForUpdateDto book)
+    // {
 
-        Log.Information("Updating book with id {id}", id);
+    //     Log.Information("Updating book with id {id}", id);
 
-        //check if book to update exists
-        bool bookExists = _bookService.CheckIfBookExists(id);
+    //     //check if book to update exists
+    //     bool bookExists = _bookService.CheckIfBookExists(id);
 
 
-        if (!bookExists)
-        {
-            //throw new ApplicationException($"Book with id {id} not found");
-            return NotFound();
-        }
+    //     if (!bookExists)
+    //     {
+    //         //throw new ApplicationException($"Book with id {id} not found");
+    //         return NotFound();
+    //     }
 
-        var bookToUpdate = new Book(book.Title, book.Author, book.Description, book.Genre, book.Year, book.Pages);
-        bookToUpdate.Id = id;
+    //     var bookToUpdate = new Book(book.Title, book.Author, book.Description, book.Genre, book.Year, book.Pages);
+    //     bookToUpdate.Id = id;
 
-        _bookService.UpdateBook(id, bookToUpdate);
+    //     _bookService.UpdateBook(id, bookToUpdate);
 
-        var bookDto = new BookDto
-        {
-            Id = bookToUpdate.Id,
-            Author = book.Author,
-            Title = book.Title,
-            Description = book.Description,
-            Genre = book.Genre,
-            Year = book.Year,
-            Pages = book.Pages
+    //     var bookDto = new BookDto
+    //     {
+    //         Id = bookToUpdate.Id,
+    //         Author = book.Author,
+    //         Title = book.Title,
+    //         Description = book.Description,
+    //         Genre = book.Genre,
+    //         Year = book.Year,
+    //         Pages = book.Pages
 
-        };
+    //     };
 
-        var responseDto = new ResponseDto
-        {
-            Data = bookDto,
-            IsSuccess = true,
-            StatusCode = 200,
-            Message = "Book updated successfully"
-        };
+    //     var responseDto = new ResponseDto
+    //     {
+    //         Data = bookDto,
+    //         IsSuccess = true,
+    //         StatusCode = 200,
+    //         Message = "Book updated successfully"
+    //     };
 
-        return Ok(responseDto);
-    }
+    //     return Ok(responseDto);
+    // }
 
     [HttpDelete("{id}")]
-    public ActionResult DeleteBook(int id)
+    public async Task<ActionResult> DeleteBook(int id)
     {
         Log.Information("Deleting book with id {id}", id);
 
         //check if book to update exists
-        bool bookExists = _bookService.CheckIfBookExists(id);
+        bool bookExists = await _bookService.CheckIfBookExistsAsync(id);
 
 
         if (!bookExists)
@@ -202,8 +186,10 @@ public class BookController : ControllerBase
             return NotFound(responseDto);
         }
 
-        _bookService.DeleteBook(id);
+        var bookInStore = await _bookService.GetBookByIdAsync(id);
+        _bookService.DeleteBook(bookInStore);
 
+        _bookService.SaveChangesAsync();
 
         return NoContent();
 
