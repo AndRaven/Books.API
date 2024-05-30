@@ -15,7 +15,7 @@ The API is intended to be part of a network of APIs that will be used to provide
 
 # Books API Design considerations
 
-Database: in the 1st iteration, the API leverages a SQLite database and EF Core 6.
+Database: in the 1st iteration, the API leverages a SQLite database and EF Core 6. Future iterations will use a cloud based database offering (Azure SQL)
 
 Logging is done with Serilog.
 
@@ -24,9 +24,12 @@ API documentation leverages Swagger Open API.
 Patterns used:
 
 - Repository Pattern - abstraction layer on top of the database access layer and database context; increases testability and separates business logic from data access logic
+- Dependency Injection
+
+Endpoints responses have been wrapped up in a generic \* _ ResponseDto _ _ that will contain the BookDtos as part of a _ _ Data _ \* field. This approcah will provide consistency for API clients.
 
 # Running the API and deployment
 
 The API can be run on a local machine or in a Docker container.
 
-API deployed to Azure AppService
+GitHub actions have been configured for CI/CD pipeline and the API gets deployed to Azure AppService.
