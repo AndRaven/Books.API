@@ -13,15 +13,15 @@ USER appuser
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 ARG configuration=Release
 WORKDIR /src
-COPY ["Books.API.csproj", "./"]
-RUN dotnet restore "Books.API.csproj"
+COPY ["BooksAPI/Books.API.csproj", "./"]
+RUN dotnet restore "BooksAPI/Books.API.csproj"
 COPY . .
 WORKDIR "/src/."
-RUN dotnet build "Books.API.csproj" -c $configuration -o /app/build
+RUN dotnet build "BooksAPI/Books.API.csproj" -c $configuration -o /app/build
 
 FROM build AS publish
 ARG configuration=Release
-RUN dotnet publish "Books.API.csproj" -c $configuration -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "BooksAPI/Books.API.csproj" -c $configuration -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
