@@ -26,7 +26,7 @@ Patterns used:
 - Repository Pattern - abstraction layer on top of the database access layer and database context; increases testability and separates business logic from data access logic
 - Dependency Injection
 
-Endpoints responses have been wrapped up in a generic \* _ ResponseDto _ _ that will contain the BookDtos as part of a _ _ Data _ \* field. This approcah will provide consistency for API clients.
+Endpoints responses have been wrapped up in a generic  _ResponseDto_  that will contain the BookDtos as part of a  _Data_ field. This approcah will provide consistency for API clients.
 
 # Running the API and deployment
 
