@@ -2,35 +2,40 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "build",
-      "command": "dotnet",
-      "type": "process",
-      "args": [
-        "build",
-        "${workspaceFolder}/Books.API.sln",
-        "/property:GenerateFullPaths=true",
-        "/consoleloggerparameters:NoSummary;ForceNoAlign"
-      ],
-      "problemMatcher": "$msCompile"
+        "label": "build",
+        "command": "dotnet",
+        "type": "process",
+        "args": [
+            "build",
+            "${workspaceFolder}/Books.API.sln",
+            "/property:GenerateFullPaths=true",
+            "/consoleloggerparameters:NoSummary;ForceNoAlign"
+        ],
+        "problemMatcher": "$msCompile"
     },
     {
-      "label": "publish",
-      "command": "dotnet",
-      "type": "process",
-      "args": [
-        "publish",
-        "${workspaceFolder}/Books.API.sln",
-        "/property:GenerateFullPaths=true",
-        "/consoleloggerparameters:NoSummary;ForceNoAlign"
-      ],
-      "problemMatcher": "$msCompile"
+        "label": "publish",
+        "command": "dotnet",
+        "type": "process",
+        "args": [
+            "publish",
+            "${workspaceFolder}/Books.API.sln",
+            "/property:GenerateFullPaths=true",
+            "/consoleloggerparameters:NoSummary;ForceNoAlign"
+        ],
+        "problemMatcher": "$msCompile"
     },
     {
-      "label": "watch",
-      "command": "dotnet",
-      "type": "process",
-      "args": ["watch", "run", "--project", "${workspaceFolder}/Books.API.sln"],
-      "problemMatcher": "$msCompile"
+        "label": "watch",
+        "command": "dotnet",
+        "type": "process",
+        "args": [
+            "watch",
+            "run",
+            "--project",
+            "${workspaceFolder}/Books.API.sln"
+        ],
+        "problemMatcher": "$msCompile"
     },
     {
       "type": "docker-build",
@@ -44,7 +49,7 @@
         "pull": true
       },
       "netCore": {
-        "appProject": "${workspaceFolder}/Books.API.csproj"
+        "appProject": "${workspaceFolder}/BooksAPI/Books.API.csproj"
       }
     },
     {
@@ -62,7 +67,7 @@
         "pull": true
       },
       "netCore": {
-        "appProject": "${workspaceFolder}/Books.API.csproj"
+        "appProject": "${workspaceFolder}/BooksAPI/Books.API.csproj"
       }
     },
     {
@@ -71,7 +76,7 @@
       "dependsOn": ["docker-build: debug"],
       "dockerRun": {},
       "netCore": {
-        "appProject": "${workspaceFolder}/Books.API.csproj",
+        "appProject": "${workspaceFolder}/BooksAPI/Books.API.csproj",
         "enableDebugging": true
       }
     },
@@ -81,7 +86,7 @@
       "dependsOn": ["docker-build: release"],
       "dockerRun": {},
       "netCore": {
-        "appProject": "${workspaceFolder}/Books.API.csproj"
+        "appProject": "${workspaceFolder}/BooksAPI/Books.API.csproj"
       }
     }
   ]

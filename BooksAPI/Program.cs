@@ -1,5 +1,3 @@
-// using Serilog;
-// using Serilog.Events;
 
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -51,7 +49,6 @@ builder.Services.AddControllers(options =>
     options.ReturnHttpNotAcceptable = true;
 }).AddNewtonsoftJson();
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -63,7 +60,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 //used for initial development, before using EF core migrations and SQLite, code first approach
 //builder.Services.AddSingleton<BooksDataStore>();
 
-var sqlLiteConnString = builder.Configuration["ConnectionStrings:BooksDBConnectionString"];
+var sqlLiteConnString = builder.Configuration.GetConnectionString("BooksDBConnectionString");
 //register the DB context
 builder.Services.AddDbContext<BooksDbContext>(dbContextOptions => dbContextOptions.UseSqlite(sqlLiteConnString));
 
