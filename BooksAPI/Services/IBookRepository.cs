@@ -9,7 +9,7 @@ public interface IBookRepository
 
     void RemoveBook(Book book);
 
-    Task<Book> GetBookByIdAsync(int bookId);
+    Task<Book?> GetBookByIdAsync(int bookId);
 
     Task<bool> SaveChangesAsync();
 
