@@ -26,7 +26,7 @@ public class BookRepository : IBookRepository
         return await _booksDbContext.Books.ToListAsync();
     }
 
-    public async Task<Book> GetBookByIdAsync(int bookId)
+    public async Task<Book?> GetBookByIdAsync(int bookId)
     {
         return await _booksDbContext.Books.Where(book => book.Id == bookId).FirstOrDefaultAsync();
     }
@@ -39,5 +39,14 @@ public class BookRepository : IBookRepository
     public async Task<bool> SaveChangesAsync()
     {
         return await _booksDbContext.SaveChangesAsync() >= 0;
+    }
+
+    private void MoreWaysToGetDataWithLinq()
+    {
+        var bookId = 10;
+        //get a Book by ID
+
+        Book? book = _booksDbContext.Books.FirstOrDefault(book => book.Id == bookId);
+
     }
 }
