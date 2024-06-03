@@ -2,11 +2,12 @@
 using AutoMapper;
 using Books.API.DataAccess.Entities;
 using Books.API.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 // using Serilog;
 
-
+[Authorize]
 [ApiController]
 [Route("api/books")]
 public class BookController : ControllerBase

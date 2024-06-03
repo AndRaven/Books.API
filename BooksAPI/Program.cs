@@ -1,7 +1,10 @@
 
+using System.Text;
 using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Serilog.Events;
 
@@ -62,7 +65,9 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var sqlLiteConnString = builder.Configuration.GetConnectionString("BooksDBConnectionString");
 //register the DB context
-builder.Services.AddDbContext<BooksDbContext>(dbContextOptions => dbContextOptions.UseSqlite(sqlLiteConnString));
+builder.Services.AddDbContext<BooksDbContext>(
+    dbContextOptions => dbContextOptions.UseSqlite(sqlLiteConnString)
+    );
 
 //add forwarded header options - for deployment
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
@@ -70,6 +75,23 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.ForwardedHeaders =
         ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
 });
+
+//add JWT authentication
+builder.Services.
+AddAuthentication(JwtBearerDefaults.AuthenticationScheme).
+AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidIssuer = builder.Configuration["Authentication:Issuer"],
+            ValidAudience = builder.Configuration["Authentication:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["Authentication:SecretKey"]))
+        };
+    });
+
 
 var app = builder.Build();
 
@@ -86,8 +108,21 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
+
 app.UseAuthorization();
 
 app.MapControllers();
+
+//apply and database pending migrations
+using (var scope = app.Services.CreateScope())
+{
+    var databaseContext = scope.ServiceProvider.GetRequiredService<BooksDbContext>();
+
+    if (databaseContext.Database.GetPendingMigrations().Any())
+    {
+        databaseContext.Database.Migrate();
+    }
+}
 
 app.Run();
