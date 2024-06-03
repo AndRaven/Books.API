@@ -2,7 +2,7 @@
 
 Books.API is a RESTful API for managing books (retrieving book related data, updating book information or adding books) built with NET Core 6.0 and Entity Framework Core 6.0.
 
-The API is intended to be part of a network of APIs that will be used to provide teh back-end functionality for a book challenge tracking web application.
+The API is intended to be part of a network of APIs that will be used to provide the back-end functionality for a book challenge tracking web application.
 
 # Books API Endpoints
 
@@ -27,6 +27,14 @@ Patterns used:
 - Dependency Injection
 
 Endpoints responses have been wrapped up in a generic \* _ ResponseDto _ _ that will contain the BookDtos as part of a _ _ Data _ \* field. This approcah will provide consistency for API clients.
+
+# Securing the API
+
+The API endpoints are secured at the Application level with JWT Bearer Token.
+
+For now, the JWT token can be obtained by calling the /api/authentication/authenticate endpoint on the same API.
+
+In future API development iterations, the token will be obtained from a separate Identity API which leverages Micrososft Identity to handle users' registration and login.
 
 # Running the API and deployment
 
