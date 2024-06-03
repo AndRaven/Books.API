@@ -26,12 +26,12 @@ public class BookController : ControllerBase
     [HttpGet]
     [ProducesResponseType(typeof(ResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetBooks()
+    public async Task<IActionResult> GetBooks(string? genre, int? year, string? searchQuery)
     {
 
         Log.Information("Getting all books");
 
-        var booksFromStore = await _bookService.GetBooksAsync();
+        var booksFromStore = await _bookService.GetBooksAsync(genre, year, searchQuery);
 
         //use AutoMapper to map between Book Entity and BookDto
 

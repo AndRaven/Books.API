@@ -8,7 +8,7 @@ public interface IBookService
 
     Task<bool> CheckIfBookExistsAsync(int bookId);
 
-    Task<IEnumerable<Book>> GetBooksAsync();
+    Task<IEnumerable<Book>> GetBooksAsync(string? genre, int? year, string? searchQuery);
 
     Task<Book?> GetBookByIdAsync(int bookId);
 
