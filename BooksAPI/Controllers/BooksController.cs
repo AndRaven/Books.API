@@ -5,7 +5,8 @@ using Books.API.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
-// using Serilog;
+
+
 
 [Authorize]
 [ApiController]
@@ -14,6 +15,8 @@ public class BookController : ControllerBase
 {
     private readonly IBookService _bookService;
     private readonly IMapper _mapper;
+
+    const int maxPageSize = 20;
 
     public BookController(IBookService bookService, IMapper mapper)
     {
@@ -26,12 +29,18 @@ public class BookController : ControllerBase
     [HttpGet]
     [ProducesResponseType(typeof(ResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetBooks(string? genre, int? year, string? searchQuery)
+    public async Task<IActionResult> GetBooks(string? genre, int? year, string? searchQuery, int pageNumber = 1, int pageSize = 10)
     {
 
         Log.Information("Getting all books");
 
-        var booksFromStore = await _bookService.GetBooksAsync(genre, year, searchQuery);
+        //restricting max Page Size for performance reasons
+        if (pageSize > maxPageSize)
+        {
+            pageSize = maxPageSize;
+        }
+
+        var booksFromStore = await _bookService.GetBooksAsync(genre, year, searchQuery, pageNumber, pageSize);
 
         //use AutoMapper to map between Book Entity and BookDto
 

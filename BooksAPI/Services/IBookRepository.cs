@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 public interface IBookRepository
 {
-    Task<IEnumerable<Book>> GetAllBooksAsync(string? genre, int? year, string? searchQuery);
+    Task<IEnumerable<Book>> GetAllBooksAsync(string? genre, int? year, string? searchQuery, int pageNumber, int pageSize);
 
     void AddBook(Book book);
 
