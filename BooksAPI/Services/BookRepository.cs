@@ -21,25 +21,27 @@ public class BookRepository : IBookRepository
         return await _booksDbContext.Books.AnyAsync(book => book.Id == bookId);
     }
 
-    public async Task<IEnumerable<Book>> GetAllBooksAsync(string? genre, int? year, string? searchQuery)
+    public async Task<IEnumerable<Book>> GetAllBooksAsync(string? genre, int? year, string? searchQuery, int pageNumber, int pageSize)
     {
-        //first apply filter by genre or year and then apply search
+        //but pagination and search capabilities should be in the repository, as close to the data as possible
+        //we don't want to load all books at once and then apply filtering
+        //we only apply the iterator ToListAsync() at the end of the method which triggers the query to be executed
 
         IQueryable<Book> books = _booksDbContext.Books as IQueryable<Book>;
 
         if (!string.IsNullOrEmpty(genre) && !string.IsNullOrEmpty(year.ToString()))
         {
-            return await books.Where(book => book.Genre == genre && book.Year == year).ToListAsync();
+            books = books.Where(book => book.Genre == genre && book.Year == year);
         }
         else
           if (!string.IsNullOrEmpty(genre))
         {
-            return await books.Where(book => book.Genre == genre).ToListAsync();
+            books = books.Where(book => book.Genre == genre);
         }
         else
             if (!string.IsNullOrEmpty(year.ToString()))
         {
-            return await books.Where(book => book.Year == year).ToListAsync();
+            books = books.Where(book => book.Year == year);
         }
 
         //apply case-insensitive search
@@ -48,15 +50,20 @@ public class BookRepository : IBookRepository
             searchQuery = searchQuery.Trim();
             searchQuery = searchQuery.ToUpper();
 
-            return await books.Where(
+            books = books.Where(
             book => book.Title.ToUpper().Contains(searchQuery) ||
             book.Author.ToUpper().Contains(searchQuery) ||
-            (!string.IsNullOrEmpty(book.Description) && book.Description.ToUpper().Contains(searchQuery))).
-            ToListAsync();
+            (!string.IsNullOrEmpty(book.Description) && book.Description.ToUpper().Contains(searchQuery)));
         }
 
-        return await books.ToListAsync();
-
+        //add pagination
+        var booksToReturn = await books.
+                                    OrderBy(book => book.Title).
+                                    Skip((pageNumber - 1) * pageSize).
+                                    Take(pageSize).
+                                    ToListAsync();
+        //return all books
+        return booksToReturn;
     }
 
     public async Task<Book?> GetBookByIdAsync(int bookId)

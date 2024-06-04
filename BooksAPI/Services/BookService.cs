@@ -23,12 +23,12 @@ public class BookService : IBookService
     }
 
 
-    public async Task<IEnumerable<Book>> GetBooksAsync(string? genre, int? year, string? searchQuery)
+    public async Task<IEnumerable<Book>> GetBooksAsync(string? genre, int? year, string? searchQuery, int pageNumber, int pageSize)
     {
         //we can add business logic here
         //but pagination and search capabilities should be in the repository, as close to the data as possible
         //we don;t want to load all books at once and then apply filtering
-        return await _bookRepository.GetAllBooksAsync(genre, year, searchQuery);
+        return await _bookRepository.GetAllBooksAsync(genre, year, searchQuery, pageNumber, pageSize);
     }
 
     public void DeleteBook(Book book)
